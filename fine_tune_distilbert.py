@@ -49,12 +49,26 @@ def compute_metrics(eval_pred):
     predictions = np.argmax(logits, axis=-1)
     return metric.compute(predictions=predictions, references=labels)
 
+# pass tokenized data (i.e. token_ds)
 def fine_tune(token_ds):
     model_checkpoint = 'distilbert-base-uncased'
     id2label = {0: "Benign", 1: "Malicious"}
-    label2id = {"Benign":0, "Malicious":1}
-    model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint, num_labels=2, id2label=id2label, label2id=label2id)
-    training_args = TrainingArguments(output_dir="test_trainer", evaluation_strategy="epoch")
+    label2id = {"Benign": 0, "Malicious": 1}
+    
+    model = AutoModelForSequenceClassification.from_pretrained(
+        model_checkpoint, num_labels=2, id2label=id2label, label2id=label2id
+    )
+    
+    training_args = TrainingArguments(
+        output_dir="test_trainer",
+        evaluation_strategy="epoch",
+        learning_rate=2e-5,  # Experiment with different learning rates
+        per_device_train_batch_size=8,  # Experiment with batch size
+        num_train_epochs=3,  # Experiment with the number of epochs
+        weight_decay=0.01,  # Experiment with weight decay
+        logging_dir="logs",
+    )
+    
     trainer = Trainer(
         model=model,
         args=training_args,
@@ -62,10 +76,13 @@ def fine_tune(token_ds):
         eval_dataset=token_ds["test"],
         compute_metrics=compute_metrics,
     )
+    
     trainer.train()
     trainer.save_model("sql_llm/sql_distilbert")
     trainer.evaluate(token_ds["test"])
+    
     return model
+
 
 def main():
     ds = load_csv_to_ds()
