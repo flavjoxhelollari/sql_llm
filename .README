@@ -1,4 +1,4 @@
-
+""" SQL Injections, a common attack method, involve embedding malicious code in a SQL query to trick a system into unintended actions. While modern systems use Web Application Firewalls (WAF) for defense, attackers can deceive WAFs by employing mutations, as demonstrated in the paper "WAF-A-MoLE: Evading Web Application Firewalls through Adversarial Machine Learning." Our work focuses on enhancing existing WAF models to better thwart such attacks, showcasing the effectiveness of fine-tuning a DistilBert model in accurately detecting mutated malicious queries. """
 
 first:
 
